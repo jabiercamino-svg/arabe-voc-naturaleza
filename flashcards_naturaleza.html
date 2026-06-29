@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Flashcards Árabe – Naturaleza</title>
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Lato', sans-serif;
+      background: #0b1a0e;
+      color: #e0eed8;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 36px 20px 48px;
+    }
+
+    h1 {
+      font-family: 'Arial Unicode MS', 'Arial', sans-serif;
+      font-size: 46px;
+      font-weight: 700;
+      color: #7dbb6a;
+      text-align: center;
+      margin-bottom: 2px;
+      direction: rtl;
+    }
+
+    .subtitle {
+      font-size: 13px;
+      font-weight: 300;
+      color: #2e4a28;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      text-align: center;
+      margin-bottom: 12px;
+    }
+
+    .category-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      margin-bottom: 24px;
+      max-width: 720px;
+    }
+
+    .tab {
+      font-family: 'Lato', sans-serif;
+      font-size: 12px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 6px 16px;
+      border-radius: 20px;
+      border: 1px solid #1e3a18;
+      background: transparent;
+      color: #3a5a30;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .tab:hover { border-color: #7dbb6a; color: #7dbb6a; }
+    .tab.active {
+      background: #7dbb6a;
+      color: #0b1a0e;
+      border-color: #7dbb6a;
+      font-weight: 700;
+    }
+
+    .search-wrap {
+      width: 100%;
+      max-width: 480px;
+      margin-bottom: 24px;
+    }
+
+    .search-wrap input {
+      width: 100%;
+      padding: 12px 18px;
+      border-radius: 30px;
+      border: 1px solid #1e3a18;
+      background: #060e07;
+      color: #e0eed8;
+      font-size: 15px;
+      font-family: 'Lato', sans-serif;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .search-wrap input::placeholder { color: #1e3a18; }
+    .search-wrap input:focus { border-color: #7dbb6a; }
+
+    .controls {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-bottom: 32px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      font-family: 'Lato', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      padding: 10px 28px;
+      border-radius: 30px;
+      border: 1px solid #1e3a18;
+      background: transparent;
+      color: #e0eed8;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.1s;
+    }
+
+    .btn:hover {
+      background: #122a0e;
+      border-color: #7dbb6a;
+      color: #7dbb6a;
+    }
+
+    .btn:active { transform: scale(0.97); }
+    .btn.active {
+      background: #7dbb6a;
+      color: #0b1a0e;
+      border-color: #7dbb6a;
+    }
+
+    .card-wrap {
+      width: 100%;
+      max-width: 620px;
+      height: 380px;
+      perspective: 1200px;
+      cursor: pointer;
+    }
+
+    .card-inner {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.6s cubic-bezier(.4,0,.2,1);
+    }
+
+    .card-inner.flipped { transform: rotateY(180deg); }
+
+    .face {
+      position: absolute;
+      inset: 0;
+      border-radius: 20px;
+      backface-visibility: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 36px;
+      text-align: center;
+    }
+
+    .face.front {
+      background: #060e07;
+      border: 1px solid #1e3a18;
+    }
+
+    .face.back {
+      background: #0f2612;
+      border: 1px solid #7dbb6a;
+      transform: rotateY(180deg);
+    }
+
+    /* FRONT */
+    .category-label {
+      font-size: 11px;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: #2e4a28;
+      padding: 4px 14px;
+      border: 1px solid #1e3a18;
+      border-radius: 20px;
+      margin-bottom: 4px;
+    }
+
+    .front-words {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      width: 100%;
+    }
+
+    .arabic-singular {
+      font-family: 'Arial Unicode MS', 'Arial', sans-serif;
+      font-size: 58px;
+      direction: rtl;
+      color: #7dbb6a;
+      line-height: 1.2;
+    }
+
+    .front-divider {
+      font-size: 13px;
+      letter-spacing: 3px;
+      color: #2e4a28;
+      text-transform: uppercase;
+    }
+
+    .arabic-plural {
+      font-family: 'Arial Unicode MS', 'Arial', sans-serif;
+      font-size: 42px;
+      direction: rtl;
+      color: #5a9a48;
+      line-height: 1.2;
+    }
+
+    .hint {
+      font-size: 11px;
+      color: #1e3a18;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-top: 6px;
+    }
+
+    /* BACK */
+    .back-row {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      width: 100%;
+    }
+
+    .back-arabic {
+      font-family: 'Arial Unicode MS', 'Arial', sans-serif;
+      font-size: 36px;
+      direction: rtl;
+      color: #7dbb6a;
+      line-height: 1.2;
+    }
+
+    .back-roman {
+      font-size: 18px;
+      font-style: italic;
+      color: #4a8a38;
+      font-weight: 300;
+    }
+
+    .back-meaning {
+      font-size: 22px;
+      font-weight: 700;
+      color: #e0eed8;
+    }
+
+    .back-divider {
+      width: 50px;
+      height: 1px;
+      background: #1e3a18;
+      margin: 6px 0;
+    }
+
+    .back-plural-label {
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #2e4a28;
+    }
+
+    .back-arabic-plural {
+      font-family: 'Arial Unicode MS', 'Arial', sans-serif;
+      font-size: 30px;
+      direction: rtl;
+      color: #5a9a48;
+      line-height: 1.2;
+    }
+
+    .back-roman-plural {
+      font-size: 16px;
+      font-style: italic;
+      color: #3a7028;
+      font-weight: 300;
+    }
+
+    .back-meaning-plural {
+      font-size: 17px;
+      color: #a0c890;
+    }
+
+    .help {
+      margin-top: 20px;
+      font-size: 11px;
+      color: #1e3a18;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      text-align: center;
+    }
+
+    .no-results { font-size: 16px; color: #2e4a28; }
+
+    @media (max-width: 500px) {
+      .arabic-singular { font-size: 42px; }
+      .arabic-plural { font-size: 30px; }
+      .card-wrap { height: 360px; }
+      h1 { font-size: 32px; }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>الطبيعة</h1>
+  <div class="subtitle">Flashcards · Vocabulario · La Naturaleza</div>
+
+  <div class="category-tabs" id="tabs"></div>
+
+  <div class="search-wrap">
+    <input type="text" id="search" placeholder="Buscar: mar, montaña, río..." oninput="filterCards()">
+  </div>
+
+  <div class="controls">
+    <button class="btn" onclick="prevCard()">⬅ Anterior</button>
+    <button class="btn" onclick="flipCard()">🔄 Girar</button>
+    <button class="btn" onclick="nextCard()">Siguiente ➡</button>
+    <button class="btn" id="randomBtn" onclick="toggleRandom()">🔀 Aleatorio: NO</button>
+    <button class="btn" onclick="shuffleCards()">⇄ Mezclar</button>
+  </div>
+
+  <div class="card-wrap" onclick="flipCard()">
+    <div class="card-inner" id="card-inner">
+      <div class="face front" id="front"></div>
+      <div class="face back" id="back"></div>
+    </div>
+  </div>
+
+  <div class="help">espacio = girar · ← → = navegar</div>
+
+  <script>
+    const words = [
+      // Agua
+      { sg: 'بَحْر',      sgR: 'baḥr',         sgM: 'mar',              pl: 'بِحَار',     plR: 'biḥār',        plM: 'mares',              cat: 'Agua' },
+      { sg: 'نَهْر',      sgR: 'nahr',          sgM: 'río',              pl: 'أَنْهَار',   plR: 'anhār',        plM: 'ríos',               cat: 'Agua' },
+      { sg: 'بُحَيْرَة',  sgR: 'buḥayra',       sgM: 'lago',             pl: 'بُحَيْرَات', plR: 'buḥayrāt',     plM: 'lagos',              cat: 'Agua' },
+      { sg: 'مُحِيط',     sgR: 'muḥīṭ',         sgM: 'océano',           pl: 'مُحِيطَات',  plR: 'muḥīṭāt',      plM: 'océanos',            cat: 'Agua' },
+      { sg: 'شَلَّال',    sgR: 'shallāl',       sgM: 'cascada',          pl: 'شَلَّالَات', plR: 'shallālāt',    plM: 'cascadas',           cat: 'Agua' },
+      { sg: 'خَلِيج',     sgR: 'khalīj',        sgM: 'golfo / bahía',    pl: 'خُلْجَان',   plR: 'khūljān',      plM: 'golfos',             cat: 'Agua' },
+      { sg: 'جَزِيرَة',   sgR: 'jazīra',        sgM: 'isla',             pl: 'جُزُر',      plR: 'juzur',        plM: 'islas',              cat: 'Agua' },
+      { sg: 'شَاطِئ',     sgR: 'shāṭiʾ',        sgM: 'playa / orilla',   pl: 'شَوَاطِئ',   plR: 'shawāṭiʾ',     plM: 'playas',             cat: 'Agua' },
+      { sg: 'مَوْج',      sgR: 'mawj',          sgM: 'ola',              pl: 'أَمْوَاج',   plR: 'amwāj',        plM: 'olas',               cat: 'Agua' },
+      { sg: 'يَنْبُوع',   sgR: 'yanbūʿ',        sgM: 'manantial / fuente', pl: 'يَنَابِيع', plR: 'yanābīʿ',     plM: 'manantiales',        cat: 'Agua' },
+
+      // Tierra y relieve
+      { sg: 'جَبَل',      sgR: 'jabal',         sgM: 'montaña',          pl: 'جِبَال',     plR: 'jibāl',        plM: 'montañas',           cat: 'Tierra' },
+      { sg: 'تَلّ',       sgR: 'tall',          sgM: 'colina',           pl: 'تِلَال',     plR: 'tilāl',        plM: 'colinas',            cat: 'Tierra' },
+      { sg: 'وَادٍ',      sgR: 'wādin',         sgM: 'valle',            pl: 'أَوْدِيَة',  plR: 'awdiya',       plM: 'valles',             cat: 'Tierra' },
+      { sg: 'صَحْرَاء',   sgR: 'ṣaḥrāʾ',        sgM: 'desierto',         pl: 'صَحَارَى',   plR: 'ṣaḥārā',       plM: 'desiertos',          cat: 'Tierra' },
+      { sg: 'غَابَة',     sgR: 'ghāba',         sgM: 'bosque',           pl: 'غَابَات',    plR: 'ghābāt',       plM: 'bosques',            cat: 'Tierra' },
+      { sg: 'سَهْل',      sgR: 'sahl',          sgM: 'llanura',          pl: 'سُهُول',     plR: 'suhūl',        plM: 'llanuras',           cat: 'Tierra' },
+      { sg: 'صَخْرَة',    sgR: 'ṣakhra',        sgM: 'roca',             pl: 'صُخُور',     plR: 'ṣukhūr',       plM: 'rocas',              cat: 'Tierra' },
+      { sg: 'حَجَر',      sgR: 'ḥajar',         sgM: 'piedra',           pl: 'أَحْجَار',   plR: 'aḥjār',        plM: 'piedras',            cat: 'Tierra' },
+      { sg: 'رَمْلَة',    sgR: 'ramla',         sgM: 'arena',            pl: 'رِمَال',     plR: 'rimāl',        plM: 'arenas',             cat: 'Tierra' },
+      { sg: 'طِين',       sgR: 'ṭīn',           sgM: 'barro / arcilla',  pl: 'أَطْيَان',   plR: 'aṭyān',        plM: 'barros',             cat: 'Tierra' },
+      { sg: 'كَهْف',      sgR: 'kahf',          sgM: 'cueva',            pl: 'كُهُوف',     plR: 'kuhūf',        plM: 'cuevas',             cat: 'Tierra' },
+      { sg: 'بُرْكَان',   sgR: 'burkān',        sgM: 'volcán',           pl: 'بَرَاكِين',  plR: 'barākīn',      plM: 'volcanes',           cat: 'Tierra' },
+
+      // Cielo y atmósfera
+      { sg: 'سَمَاء',     sgR: 'samāʾ',         sgM: 'cielo',            pl: 'سَمَاوَات',  plR: 'samāwāt',      plM: 'cielos',             cat: 'Cielo' },
+      { sg: 'شَمْس',      sgR: 'shams',         sgM: 'sol',              pl: 'شُمُوس',     plR: 'shumūs',       plM: 'soles',              cat: 'Cielo' },
+      { sg: 'قَمَر',      sgR: 'qamar',         sgM: 'luna',             pl: 'أَقْمَار',   plR: 'aqmār',        plM: 'lunas',              cat: 'Cielo' },
+      { sg: 'نَجْم',      sgR: 'najm',          sgM: 'estrella',         pl: 'نُجُوم',     plR: 'nujūm',        plM: 'estrellas',          cat: 'Cielo' },
+      { sg: 'غَيْمَة',    sgR: 'ghayma',        sgM: 'nube',             pl: 'غُيُوم',     plR: 'ghuyūm',       plM: 'nubes',              cat: 'Cielo' },
+      { sg: 'مَطَر',      sgR: 'maṭar',         sgM: 'lluvia',           pl: 'أَمْطَار',   plR: 'amṭār',        plM: 'lluvias',            cat: 'Cielo' },
+      { sg: 'ثَلْج',      sgR: 'thalj',         sgM: 'nieve / hielo',    pl: 'ثُلُوج',     plR: 'thulūj',       plM: 'nieves',             cat: 'Cielo' },
+      { sg: 'رِيح',       sgR: 'rīḥ',           sgM: 'viento',           pl: 'رِيَاح',     plR: 'riyāḥ',        plM: 'vientos',            cat: 'Cielo' },
+      { sg: 'عَاصِفَة',   sgR: 'ʿāṣifa',        sgM: 'tormenta',         pl: 'عَوَاصِف',   plR: 'ʿawāṣif',      plM: 'tormentas',          cat: 'Cielo' },
+      { sg: 'بَرْق',      sgR: 'barq',          sgM: 'rayo / relámpago', pl: 'بُرُوق',     plR: 'burūq',        plM: 'rayos',              cat: 'Cielo' },
+      { sg: 'رَعْد',      sgR: 'raʿd',          sgM: 'trueno',           pl: 'رُعُود',     plR: 'ruʿūd',        plM: 'truenos',            cat: 'Cielo' },
+      { sg: 'ضَبَاب',     sgR: 'ḍabāb',         sgM: 'niebla',           pl: 'أَضْبِبَة',  plR: 'aḍbiba',       plM: 'nieblas',            cat: 'Cielo' },
+      { sg: 'قَوْس قُزَح', sgR: 'qaws quzaḥ',   sgM: 'arco iris',        pl: 'أَقْوَاس',   plR: 'aqwās',        plM: 'arcos iris',         cat: 'Cielo' },
+
+      // Fuego y luz
+      { sg: 'نَار',       sgR: 'nār',           sgM: 'fuego',            pl: 'نِيرَان',    plR: 'nīrān',        plM: 'fuegos',             cat: 'Fuego y luz' },
+      { sg: 'لَهَب',      sgR: 'lahab',         sgM: 'llama',            pl: 'أَلْهِبَة',  plR: 'alhiba',       plM: 'llamas',             cat: 'Fuego y luz' },
+      { sg: 'دُخَان',     sgR: 'dukhān',        sgM: 'humo',             pl: 'أَدْخِنَة',  plR: 'adkhina',      plM: 'humos',              cat: 'Fuego y luz' },
+      { sg: 'نُور',       sgR: 'nūr',           sgM: 'luz',              pl: 'أَنْوَار',   plR: 'anwār',        plM: 'luces',              cat: 'Fuego y luz' },
+      { sg: 'ظِلّ',       sgR: 'ẓill',          sgM: 'sombra',           pl: 'ظِلَال',     plR: 'ẓilāl',        plM: 'sombras',            cat: 'Fuego y luz' },
+
+      // Plantas y vegetación
+      { sg: 'شَجَرَة',    sgR: 'shajara',       sgM: 'árbol',            pl: 'أَشْجَار',   plR: 'ashjār',       plM: 'árboles',            cat: 'Plantas' },
+      { sg: 'زَهْرَة',    sgR: 'zahra',         sgM: 'flor',             pl: 'زُهُور',     plR: 'zuhūr',        plM: 'flores',             cat: 'Plantas' },
+      { sg: 'عُشْب',      sgR: 'ʿushb',         sgM: 'hierba',           pl: 'أَعْشَاب',   plR: 'aʿshāb',       plM: 'hierbas',            cat: 'Plantas' },
+      { sg: 'وَرَقَة',    sgR: 'waraqa',        sgM: 'hoja',             pl: 'أَوْرَاق',   plR: 'awrāq',        plM: 'hojas',              cat: 'Plantas' },
+      { sg: 'جَذْر',      sgR: 'jadhir',        sgM: 'raíz',             pl: 'جُذُور',     plR: 'judhūr',       plM: 'raíces',             cat: 'Plantas' },
+      { sg: 'غَابَة',     sgR: 'ghāba',         sgM: 'bosque',           pl: 'غَابَات',    plR: 'ghābāt',       plM: 'bosques',            cat: 'Plantas' },
+      { sg: 'نَخْلَة',    sgR: 'nakhla',        sgM: 'palmera',          pl: 'نَخْل',      plR: 'nakhl',        plM: 'palmeras',           cat: 'Plantas' },
+      { sg: 'بَذْرَة',    sgR: 'badhira',       sgM: 'semilla',          pl: 'بُذُور',     plR: 'budhūr',       plM: 'semillas',           cat: 'Plantas' },
+
+      // Cosmos
+      { sg: 'كَوْكَب',    sgR: 'kawkab',        sgM: 'planeta',          pl: 'كَوَاكِب',   plR: 'kawākib',      plM: 'planetas',           cat: 'Cosmos' },
+      { sg: 'مَجَرَّة',   sgR: 'majarra',       sgM: 'galaxia',          pl: 'مَجَرَّات',  plR: 'majarrāt',     plM: 'galaxias',           cat: 'Cosmos' },
+      { sg: 'أُفُق',      sgR: 'ufuq',          sgM: 'horizonte',        pl: 'آفَاق',      plR: 'āfāq',         plM: 'horizontes',         cat: 'Cosmos' },
+    ];
+
+    const categories = ['Todas', ...new Set(words.map(w => w.cat))];
+    let activeCategory = 'Todas';
+
+    const tabsEl = document.getElementById('tabs');
+    categories.forEach(cat => {
+      const btn = document.createElement('button');
+      btn.className = 'tab' + (cat === 'Todas' ? ' active' : '');
+      btn.textContent = cat;
+      btn.onclick = () => selectCategory(cat);
+      tabsEl.appendChild(btn);
+    });
+
+    function selectCategory(cat) {
+      activeCategory = cat;
+      document.querySelectorAll('.tab').forEach(t => {
+        t.classList.toggle('active', t.textContent === cat);
+      });
+      document.getElementById('search').value = '';
+      applyFilter();
+    }
+
+    let filteredCards = [];
+    let current = 0;
+    let randomMode = false;
+
+    function applyFilter() {
+      const query = document.getElementById('search').value.toLowerCase();
+      filteredCards = words.filter(w => {
+        const matchCat = activeCategory === 'Todas' || w.cat === activeCategory;
+        const matchSearch = !query ||
+          w.sgM.toLowerCase().includes(query) ||
+          w.plM.toLowerCase().includes(query) ||
+          w.sg.includes(query) ||
+          w.pl.includes(query) ||
+          w.sgR.toLowerCase().includes(query) ||
+          w.plR.toLowerCase().includes(query);
+        return matchCat && matchSearch;
+      });
+      current = 0;
+      renderCard();
+    }
+
+    function filterCards() { applyFilter(); }
+
+    function renderCard() {
+      const frontEl = document.getElementById('front');
+      const backEl  = document.getElementById('back');
+      document.getElementById('card-inner').classList.remove('flipped');
+
+      if (!filteredCards.length) {
+        frontEl.innerHTML = '<div class="no-results">Sin resultados</div>';
+        backEl.innerHTML = '';
+        return;
+      }
+
+      const w = filteredCards[current];
+
+      frontEl.innerHTML = `
+        <div class="category-label">${w.cat}</div>
+        <div class="front-words">
+          <div class="arabic-singular">${w.sg}</div>
+          <div class="front-divider">· · ·</div>
+          <div class="arabic-plural">${w.pl}</div>
+        </div>
+        <div class="hint">toca para ver la respuesta</div>
+      `;
+
+      backEl.innerHTML = `
+        <div class="back-row">
+          <div class="back-arabic">${w.sg}</div>
+          <div class="back-roman">${w.sgR}</div>
+          <div class="back-meaning">${w.sgM}</div>
+        </div>
+        <div class="back-divider"></div>
+        <div class="back-plural-label">plural</div>
+        <div class="back-row">
+          <div class="back-arabic-plural">${w.pl}</div>
+          <div class="back-roman-plural">${w.plR}</div>
+          <div class="back-meaning-plural">${w.plM}</div>
+        </div>
+      `;
+    }
+
+    function flipCard() {
+      document.getElementById('card-inner').classList.toggle('flipped');
+    }
+
+    function nextCard() {
+      if (!filteredCards.length) return;
+      current = randomMode
+        ? Math.floor(Math.random() * filteredCards.length)
+        : (current + 1) % filteredCards.length;
+      renderCard();
+    }
+
+    function prevCard() {
+      if (!filteredCards.length) return;
+      current = randomMode
+        ? Math.floor(Math.random() * filteredCards.length)
+        : (current - 1 + filteredCards.length) % filteredCards.length;
+      renderCard();
+    }
+
+    function shuffleCards() {
+      for (let i = filteredCards.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [filteredCards[i], filteredCards[j]] = [filteredCards[j], filteredCards[i]];
+      }
+      current = 0;
+      renderCard();
+    }
+
+    function toggleRandom() {
+      randomMode = !randomMode;
+      const btn = document.getElementById('randomBtn');
+      btn.textContent = `🔀 Aleatorio: ${randomMode ? 'SÍ' : 'NO'}`;
+      btn.classList.toggle('active', randomMode);
+    }
+
+    document.addEventListener('keydown', e => {
+      if (e.code === 'Space') { e.preventDefault(); flipCard(); }
+      if (e.key === 'ArrowRight') nextCard();
+      if (e.key === 'ArrowLeft') prevCard();
+    });
+
+    applyFilter();
+  </script>
+
+</body>
+</html>
